@@ -1,3 +1,5 @@
+using BusinessLayer.Interfaces;
+using BusinessLayer.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RepoLayer.Context;
+using RepoLayer.Interfaces;
+using RepoLayer.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +33,8 @@ namespace FundooNote
         {
             services.AddControllers();
             services.AddDbContext<FundooContext>(opts => opts.UseSqlServer(Configuration["ConnectionString:FundooDB"]));
+            services.AddTransient<IUserRepo, UserRepo>();
+            services.AddTransient<IUserBusiness, UserBusiness>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
