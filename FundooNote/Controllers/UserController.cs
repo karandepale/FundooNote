@@ -72,5 +72,24 @@ namespace FundooNote.Controllers
 
 
 
+
+        [HttpGet]
+        [Route("GetUserByID")]
+        public IActionResult GetUserByID(long UserID)
+        {
+            var result = userBusiness.GetUserByID(UserID);
+            if(result != null)
+            {
+                return Ok(new { success = true, message = "User By ID Getting Successful", data = result });
+            }
+            else
+            {
+                return NotFound(new { success = false, message = "User By ID Getting Failed", data = result });
+
+            }
+        }
+
+
+
     }
 }

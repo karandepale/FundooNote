@@ -56,5 +56,17 @@ namespace BusinessLayer.Services
         }
 
 
+        public UserEntity GetUserByID(long UserID)
+        {
+            try
+            {
+                return _userRepo.GetUserByID(UserID);
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
     }
 }

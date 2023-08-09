@@ -50,6 +50,7 @@ namespace RepoLayer.Services
         }
 
 
+
 		// USER LOGIN METHOD IMPLEMENTATION:-
 		public UserEntity UserLogin(UserLoginModel model)
 		{
@@ -98,6 +99,28 @@ namespace RepoLayer.Services
 
 
 
+		//GET USER BY THIER USER-ID:-
+		public UserEntity GetUserByID(long UserID)
+		{
+			try
+			{
+				var result = fundooContext.Users.FirstOrDefault
+					(data=> data.UserID == UserID);
+				
+				if(result != null)
+				{
+					return result;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			catch (Exception ex)
+			{
+				throw (ex);
+			}
+		}
 
     }
 }
