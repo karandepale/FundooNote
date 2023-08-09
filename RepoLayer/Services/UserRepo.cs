@@ -1,10 +1,14 @@
 ﻿using CommonLayer.Model;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using RepoLayer.Context;
 using RepoLayer.Entity;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 
 namespace RepoLayer.Services
@@ -12,9 +16,11 @@ namespace RepoLayer.Services
     public class UserRepo : IUserRepo
     {
 		private readonly FundooContext fundooContext;
-        public UserRepo(FundooContext fundooContext)
+        private readonly IConfiguration configuration;
+        public UserRepo(FundooContext fundooContext , IConfiguration configuration)
         {
             this.fundooContext = fundooContext;
+			this.configuration = configuration;
         }
 
 
@@ -51,33 +57,39 @@ namespace RepoLayer.Services
 
 
 
-		// USER LOGIN METHOD IMPLEMENTATION:-
-		public UserEntity UserLogin(UserLoginModel model)
-		{
-			try
-			{
-				var result = fundooContext.Users.FirstOrDefault
-					(data => data.Email == model.Email && data.Password == model.Password);
-				
-				if(result != null)
-				{
-					return result;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			catch (Exception ex)
-			{
-				throw (ex);
-			}
-		}
+        // USER LOGIN METHOD IMPLEMENTATION:-
+        public UserLoginResult UserLogin(UserLoginModel model)
+        {
+            try
+            {
+                var userEntity = fundooContext.Users.FirstOrDefault(u => u.Email == model.Email && u.Password == model.Password);
+
+
+                if (userEntity != null)
+                {
+                    string jwtToken = GenerateJwtToken(userEntity.Email, userEntity.UserID);
+                    return new UserLoginResult
+                    {
+                        UserEntity = userEntity,
+                        JwtToken = jwtToken
+                    };
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+        }
 
 
 
-		// GET USER LIST METHOD IMPLEMENTATION:-
-		public List<UserEntity> GetAllUser()
+        // GET USER LIST METHOD IMPLEMENTATION:-
+        public List<UserEntity> GetAllUser()
 		{
 			try
 			{
@@ -122,5 +134,23 @@ namespace RepoLayer.Services
 			}
 		}
 
-    }
+
+        // JWT IMPLEMENTATION :-
+        public string GenerateJwtToken(string Email, long UserId)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("UserId", UserId.ToString()),
+                new Claim(ClaimTypes.Email, Email),
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken("JwtSettings:Issuer", "JwtSettings:Audience", claims, DateTime.Now, DateTime.Now.AddHours(1), creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+    
+
+}
 }
