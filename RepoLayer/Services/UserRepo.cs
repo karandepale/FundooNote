@@ -4,6 +4,7 @@ using RepoLayer.Entity;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RepoLayer.Services
@@ -15,6 +16,8 @@ namespace RepoLayer.Services
         {
             this.fundooContext = fundooContext;
         }
+
+
         // USER REGISTRATION METHOD IMPLEMENTATION:-
 		public UserEntity UserRegistration(UserRegistrationModel model)
         {
@@ -47,7 +50,28 @@ namespace RepoLayer.Services
         }
 
 
-
+		// USER LOGIN METHOD IMPLEMENTATION:-
+		public UserEntity UserLogin(UserLoginModel model)
+		{
+			try
+			{
+				var result = fundooContext.Users.FirstOrDefault
+					(data => data.Email == model.Email && data.Password == model.Password);
+				
+				if(result != null)
+				{
+					return result;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			catch (Exception ex)
+			{
+				throw (ex);
+			}
+		}
 
 
 
