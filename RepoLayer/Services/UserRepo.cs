@@ -75,6 +75,29 @@ namespace RepoLayer.Services
 
 
 
+		// GET USER LIST METHOD IMPLEMENTATION:-
+		public List<UserEntity> GetAllUser()
+		{
+			try
+			{
+				var result = fundooContext.Users.ToList();
+				if(result != null)
+				{
+					return result;
+				}
+				else
+				{
+                  	return null;
+				}
+			}
+			catch (Exception ex)
+			{
+				throw (ex);
+			}
+		}
+
+
+
 
     }
 }

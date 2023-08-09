@@ -54,6 +54,22 @@ namespace FundooNote.Controllers
 
 
 
+        [HttpGet]
+        [Route("UserList")]
+        public IActionResult GetAllResult()
+        {
+            var result = userBusiness.GetAllUser();
+            if (result != null)
+            {
+                return Ok(new { success = true, message = "User List Getting Successful", data = result });
+            }
+            else
+            {
+                return NotFound(new { success = false, message = "User List Getting Failed", data = result });
+
+            }
+        }
+
 
 
     }

@@ -42,5 +42,19 @@ namespace BusinessLayer.Services
 
 
 
+        public List<UserEntity> GetAllUser()
+        {
+            try
+            {
+                return _userRepo.GetAllUser();
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+
     }
 }
