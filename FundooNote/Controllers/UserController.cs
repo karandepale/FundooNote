@@ -91,5 +91,21 @@ namespace FundooNote.Controllers
 
 
 
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public IActionResult ForgotPassword(ForgotPasswordModel model)
+        {
+            var result = userBusiness.ForgotPassword(model);
+            if (result != null)
+            {
+                return Ok(new { success = true, message = "Forgot Pass Email Send Successfully" });
+            }
+            else
+            {
+                return NotFound(new { success = false, message = "Forgot pass email not send..." });
+            }
+        }
+
+
     }
 }

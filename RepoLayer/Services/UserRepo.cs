@@ -150,7 +150,32 @@ namespace RepoLayer.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-    
 
-}
+
+
+        // FORGOT PASSWORD IMPLEMENTATION USINF MSMQ:-
+        public string ForgotPassword(ForgotPasswordModel model)
+        {
+            try
+            {
+                var result = fundooContext.Users.FirstOrDefault(u => u.Email == model.Email);
+                if (result != null)
+                {
+                    var Token = GenerateJwtToken(result.Email, result.UserID);
+                    MSMQ msmq = new MSMQ();
+                    msmq.SendData2Queue(Token);
+
+                    return Token;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+
+    }
 }

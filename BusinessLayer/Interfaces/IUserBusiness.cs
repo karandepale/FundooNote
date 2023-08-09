@@ -12,5 +12,7 @@ namespace BusinessLayer.Interfaces
         public UserLoginResult UserLogin(UserLoginModel model);
         public List<UserEntity> GetAllUser();
         public UserEntity GetUserByID(long UserID);
+        public string ForgotPassword(ForgotPasswordModel model);
+
     }
 }
