@@ -15,44 +15,44 @@ namespace RepoLayer.Services
 {
     public class UserRepo : IUserRepo
     {
-		private readonly FundooContext fundooContext;
+        private readonly FundooContext fundooContext;
         private readonly IConfiguration configuration;
-        public UserRepo(FundooContext fundooContext , IConfiguration configuration)
+        public UserRepo(FundooContext fundooContext, IConfiguration configuration)
         {
             this.fundooContext = fundooContext;
-			this.configuration = configuration;
+            this.configuration = configuration;
         }
 
 
         // USER REGISTRATION METHOD IMPLEMENTATION:-
-		public UserEntity UserRegistration(UserRegistrationModel model)
+        public UserEntity UserRegistration(UserRegistrationModel model)
         {
-			try
-			{
-				UserEntity userEntity = new UserEntity();
-				userEntity.FirstName = model.FirstName;
-				userEntity.LastName = model.LastName;
-				userEntity.DateOfBirth = model.DateOfBirth;
-				userEntity.Email = model.Email;
-				userEntity.Password = model.Password;
+            try
+            {
+                UserEntity userEntity = new UserEntity();
+                userEntity.FirstName = model.FirstName;
+                userEntity.LastName = model.LastName;
+                userEntity.DateOfBirth = model.DateOfBirth;
+                userEntity.Email = model.Email;
+                userEntity.Password = model.Password;
 
-				fundooContext.Users.Add(userEntity);
-				fundooContext.SaveChanges();
+                fundooContext.Users.Add(userEntity);
+                fundooContext.SaveChanges();
 
-				if(userEntity != null)
-				{
-					return userEntity;
-				}
-				else
-				{
-					return null;
-				}
+                if (userEntity != null)
+                {
+                    return userEntity;
+                }
+                else
+                {
+                    return null;
+                }
 
-			}
-			catch (Exception ex )
-			{
-				throw(ex);
-			}
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
         }
 
 
@@ -90,49 +90,49 @@ namespace RepoLayer.Services
 
         // GET USER LIST METHOD IMPLEMENTATION:-
         public List<UserEntity> GetAllUser()
-		{
-			try
-			{
-				var result = fundooContext.Users.ToList();
-				if(result != null)
-				{
-					return result;
-				}
-				else
-				{
-                  	return null;
-				}
-			}
-			catch (Exception ex)
-			{
-				throw (ex);
-			}
-		}
+        {
+            try
+            {
+                var result = fundooContext.Users.ToList();
+                if (result != null)
+                {
+                    return result;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
 
 
 
-		//GET USER BY THIER USER-ID:-
-		public UserEntity GetUserByID(long UserID)
-		{
-			try
-			{
-				var result = fundooContext.Users.FirstOrDefault
-					(data=> data.UserID == UserID);
-				
-				if(result != null)
-				{
-					return result;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			catch (Exception ex)
-			{
-				throw (ex);
-			}
-		}
+        //GET USER BY THIER USER-ID:-
+        public UserEntity GetUserByID(long UserID)
+        {
+            try
+            {
+                var result = fundooContext.Users.FirstOrDefault
+                    (data => data.UserID == UserID);
+
+                if (result != null)
+                {
+                    return result;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
 
 
         // JWT IMPLEMENTATION :-
@@ -141,15 +141,17 @@ namespace RepoLayer.Services
             var claims = new List<Claim>
             {
                 new Claim("UserId", UserId.ToString()),
-                new Claim(ClaimTypes.Email, Email),
+                new Claim("Email", Email)
             };
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken("JwtSettings:Issuer", "JwtSettings:Audience", claims, DateTime.Now, DateTime.Now.AddHours(1), creds);
+            var token = new JwtSecurityToken(configuration["JwtSettings:Issuer"], configuration["JwtSettings:Audience"], claims, DateTime.Now, DateTime.Now.AddHours(1), creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
 
 
@@ -171,7 +173,29 @@ namespace RepoLayer.Services
             }
             catch (Exception ex)
             {
+                throw (ex);
+            }
+        }
 
+
+        public bool ResetPassword(string email, string newPass, string confirmPass)
+        {
+            try
+            {
+                if (newPass == confirmPass)
+                {
+                    var isEmailPresent = fundooContext.Users.FirstOrDefault(user => user.Email == email);
+                    isEmailPresent.Password = confirmPass;
+                    fundooContext.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
                 throw (ex);
             }
         }

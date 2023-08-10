@@ -13,6 +13,8 @@ namespace RepoLayer.Interfaces
         public List<UserEntity> GetAllUser();
         public UserEntity GetUserByID(long UserID);
         public string ForgotPassword(ForgotPasswordModel model);
+        public bool ResetPassword(string email, string newPass, string confirmPass);
+
 
     }
 }

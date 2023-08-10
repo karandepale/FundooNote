@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces;
 using CommonLayer.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,8 +10,8 @@ namespace FundooNote.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        
-        
+
+
         private readonly IUserBusiness userBusiness;
         public UserController(IUserBusiness userBusiness)
         {
@@ -23,9 +24,9 @@ namespace FundooNote.Controllers
         public IActionResult Registration(UserRegistrationModel model)
         {
             var result = userBusiness.UserRegistration(model);
-            if(result != null)
+            if (result != null)
             {
-                return this.Ok(new { success = true  , message="User Registration Successful" , data=result});
+                return this.Ok(new { success = true, message = "User Registration Successful", data = result });
             }
             else
             {
@@ -40,7 +41,7 @@ namespace FundooNote.Controllers
         public IActionResult UserLogin(UserLoginModel model)
         {
             var result = userBusiness.UserLogin(model);
-            if(result != null)
+            if (result != null)
             {
                 return Ok(new { success = true, message = "User Login Successful", data = result });
             }
@@ -78,7 +79,7 @@ namespace FundooNote.Controllers
         public IActionResult GetUserByID(long UserID)
         {
             var result = userBusiness.GetUserByID(UserID);
-            if(result != null)
+            if (result != null)
             {
                 return Ok(new { success = true, message = "User By ID Getting Successful", data = result });
             }
@@ -105,6 +106,24 @@ namespace FundooNote.Controllers
                 return NotFound(new { success = false, message = "Forgot pass email not send..." });
             }
         }
+
+        [Authorize]
+        [HttpPost]
+        [Route("ResetPass")]
+        public IActionResult ResetPassword(string newPass, string confirmPass)
+        {
+            var email = User.FindFirst("Email").Value;
+            var result = userBusiness.ResetPassword(email, newPass, confirmPass);
+            if (result != null)
+            {
+                return Ok(new { success = true, message = "Password Changed Successfully", data = result });
+            }
+            else
+            {
+                return NotFound(new { success = false, message = "Password not changed", data = result });
+            }
+        }
+
 
 
     }

@@ -40,19 +40,45 @@ namespace FundooNote
             services.AddTransient<IUserRepo, UserRepo>();
             services.AddTransient<IUserBusiness, UserBusiness>();
 
+
+
+
             // SWAGGER IMPLEMENTATION:-
+            //swagger:-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "fUNDOO NOTE API'S",
+                    Title = "Fundoo App",
                     Version = "v1",
-                    Description = "API IMPLEMENTATION",
+                    Description = "API's for Fundoo Application",
+                });
+                var securitySchema = new OpenApiSecurityScheme
+                {
+                    Description = "Using the Authorization header with the Bearer scheme.",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                };
+                c.AddSecurityDefinition("Bearer", securitySchema);
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                {
+                        securitySchema, new[] { "Bearer" } }
                 });
             });
 
 
-            // JWT IMPLEMENTATION:-
+
+            // JWT:-
+            // Configure JWT authentication
             var jwtSettings = Configuration.GetSection("JwtSettings");
             var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
 
@@ -68,12 +94,11 @@ namespace FundooNote
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["Issuer"],
-                    ValidAudience = jwtSettings["Audience"],
+                    ValidIssuer = Configuration["JwtSettings:Issuer"],
+                    ValidAudience = Configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
-
 
 
 
@@ -100,6 +125,7 @@ namespace FundooNote
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
