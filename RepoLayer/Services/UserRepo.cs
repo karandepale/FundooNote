@@ -63,15 +63,12 @@ namespace RepoLayer.Services
             try
             {
                 var userEntity = fundooContext.Users.FirstOrDefault(u => u.Email == model.Email && u.Password == model.Password);
-
-
                 if (userEntity != null)
                 {
-                    string jwtToken = GenerateJwtToken(userEntity.Email, userEntity.UserID);
                     return new UserLoginResult
                     {
                         UserEntity = userEntity,
-                        JwtToken = jwtToken
+                        JwtToken = GenerateJwtToken(userEntity.Email, userEntity.UserID)
                     };
                 }
                 else
@@ -85,6 +82,10 @@ namespace RepoLayer.Services
             }
 
         }
+
+     
+
+
 
 
 
@@ -152,6 +153,8 @@ namespace RepoLayer.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+       
+
 
 
 
@@ -178,6 +181,8 @@ namespace RepoLayer.Services
         }
 
 
+
+        //RESET PASSWORD IMPLEMENTATION:-
         public bool ResetPassword(string email, string newPass, string confirmPass)
         {
             try

@@ -3,6 +3,12 @@ using CommonLayer.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace FundooNote.Controllers
 {
@@ -10,7 +16,6 @@ namespace FundooNote.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-
 
         private readonly IUserBusiness userBusiness;
         public UserController(IUserBusiness userBusiness)
@@ -36,22 +41,24 @@ namespace FundooNote.Controllers
 
 
 
-        [HttpPost]
-        [Route("Login")]
-        public IActionResult UserLogin(UserLoginModel model)
-        {
-            var result = userBusiness.UserLogin(model);
-            if (result != null)
-            {
-                return Ok(new { success = true, message = "User Login Successful", data = result });
-            }
-            else
-            {
-                return NotFound(new { success = false, message = "User Login Failed", data = result });
+           [HttpPost]
+          [Route("Login")]
+           public IActionResult UserLogin(UserLoginModel model)
+           {
+               var result = userBusiness.UserLogin(model);
+               if (result != null)
+               {
+                   return Ok(new { success = true, message = "User Login Successful", data = result });
+               }
+              else
+               {
+                  return NotFound(new { success = false, message = "User Login Failed", data = result });
 
-            }
-        }
+             }
+         }
 
+
+       
 
 
 

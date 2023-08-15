@@ -20,6 +20,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CloudinaryDotNet;
+
+
 
 namespace FundooNote
 {
@@ -35,13 +38,29 @@ namespace FundooNote
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // IMPLEMENT CLOUDINARY:-
+                        services.AddSingleton(new Cloudinary(new Account(
+                                cloud: "YOUR_CLOUD_NAME",
+                                apiKey: "YOUR_API_KEY",
+                                apiSecret: "YOUR_API_SECRET"
+                            )));
+
+
             services.AddControllers();
             services.AddDbContext<FundooContext>(opts => opts.UseSqlServer(Configuration["ConnectionString:FundooDB"]));
+
+           //DI FOR SCOPED SERVICE:-(Scoped service is created per client HttpRequest)
+            services.AddScoped<IScopedUserIdService, ScopedUserIdService>();
+
+
+
+            // USERS TABLE CONFIGURATION:-
             services.AddTransient<IUserRepo, UserRepo>();
             services.AddTransient<IUserBusiness, UserBusiness>();
 
-
-
+            // NOTES TABLE CONFIGURATION:-
+            services.AddTransient<INotesRepo , NotesRepo>();
+            services.AddTransient<INotesBusiness, NotesBusiness>();
 
             // SWAGGER IMPLEMENTATION:-
             //swagger:-
