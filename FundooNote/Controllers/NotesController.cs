@@ -244,28 +244,7 @@ namespace FundooNote.Controllers
 
 
 
-        [HttpPost]
-        [Route("UploadImage")]
-        public async Task<IActionResult> UploadImage(IFormFile file)
-        {
-            if (file == null || file.Length <= 0)
-            {
-                return BadRequest("Invalid file");
-            }
-
-            var uploadResult = await notesBusiness.UploadImageAsync(file);
-
-            if (uploadResult.Error != null)
-            {
-                return BadRequest(uploadResult.Error.Message);
-            }
-
-            // Here, you can save the Cloudinary URL or any relevant information to your entity.
-            string imageUrl = uploadResult.SecureUrl.AbsoluteUri;
-
-            return Ok(new { success = true, message = "Image uploaded successfully", imageUrl });
-        }
-
+       
 
 
     }

@@ -18,22 +18,12 @@ namespace RepoLayer.Services
     {
         private readonly FundooContext fundooContext;
         private readonly IScopedUserIdService scopedUserIdService;
-        private readonly Cloudinary _cloudinary;
 
 
         public NotesRepo(FundooContext fundooContext, IScopedUserIdService _scopedUserIdService , IConfiguration configuration)
         {
             this.fundooContext = fundooContext;
             scopedUserIdService = _scopedUserIdService;
-
-            var cloudinarySettings = configuration.GetSection("CloudinarySettings");
-            var account = new Account(
-                cloudinarySettings["CloudName"],
-                cloudinarySettings["ApiKey"],
-                cloudinarySettings["ApiSecret"]
-            );
-
-            _cloudinary = new Cloudinary(account);
         }
 
 
@@ -260,17 +250,6 @@ namespace RepoLayer.Services
 
 
 
-        public async Task<ImageUploadResult> UploadImageAsync(IFormFile file)
-        {
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(file.FileName, file.OpenReadStream()),
-                Transformation = new Transformation().Crop("limit").Width(300).Height(300)
-            };
-
-            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-            return uploadResult;
-        }
 
 
 

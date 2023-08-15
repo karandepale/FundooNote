@@ -147,17 +147,6 @@ namespace BusinessLayer.Services
         }
 
 
-       public Task<ImageUploadResult> UploadImageAsync(IFormFile file)
-        {
-            try
-            {
-                return notesRepo.UploadImageAsync(file);    
-            }
-            catch (Exception ex)
-            {
-                throw (ex);
-            }
-        }
 
 
     }

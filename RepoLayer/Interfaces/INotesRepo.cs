@@ -20,6 +20,5 @@ namespace RepoLayer.Interfaces
         public bool IsArchive(long NoteID);
         public bool IsTrash(long NoteID);
         public bool IsPin(long NoteID);
-       public Task<ImageUploadResult> UploadImageAsync(IFormFile file);
     }
 }
