@@ -30,5 +30,34 @@ namespace BusinessLayer.Services
         }
 
 
+        public List<CollabEntity> GetAllCollabs()
+        {
+            try
+            {
+                return collabRepo.GetAllCollabs();
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+
+
+        public void DeleteACollab(long CollabID)
+        {
+            try
+            {
+                 collabRepo.DeleteACollab(CollabID);
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+
     }
 }

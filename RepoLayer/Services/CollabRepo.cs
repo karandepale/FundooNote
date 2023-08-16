@@ -4,6 +4,7 @@ using RepoLayer.Entity;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RepoLayer.Services
@@ -11,9 +12,12 @@ namespace RepoLayer.Services
     public class CollabRepo : ICollabRepo
     {
         private readonly FundooContext fundooContext;
-        public CollabRepo(FundooContext fundooContext)
+        private readonly IScopedUserIdService scopedUserIdService;
+
+        public CollabRepo(FundooContext fundooContext , IScopedUserIdService scopedUserIdService)
         {
             this.fundooContext = fundooContext;
+            this.scopedUserIdService = scopedUserIdService;
         }
 
         // CREATE COLLAB LOGIC IMPLEMENTATION:-
@@ -45,8 +49,49 @@ namespace RepoLayer.Services
         }
 
 
+        // GET LIST OF COLLABS LOGIC IMPLEMENTATION :-
+        public List<CollabEntity> GetAllCollabs()
+        {
+            try
+            {
+                var userId = scopedUserIdService.UserId;
+                var result = fundooContext.Collab.Where(data => data.UserID == userId).ToList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
 
-       
+
+
+        // DELETE A COLLAB :-
+        public void DeleteACollab(long CollabID)
+        {
+            try
+            {
+                var collabEntity = fundooContext.Collab.FirstOrDefault(c => c.CollabID == CollabID);
+
+                if (collabEntity != null)
+                {
+                    fundooContext.Collab.Remove(collabEntity);
+                    fundooContext.SaveChanges();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Collaboration not found for the given CollabID.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+
+
 
 
     }
