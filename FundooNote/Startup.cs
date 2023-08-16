@@ -67,6 +67,7 @@ namespace FundooNote
             services.AddTransient<INotesRepo , NotesRepo>();
             services.AddTransient<INotesBusiness, NotesBusiness>();
 
+            // Upload image on Cloudinary:-
             services.AddTransient<FileService, FileService>();
 
 

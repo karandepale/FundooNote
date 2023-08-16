@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RepoLayer.Context;
 
 namespace RepoLayer.Migrations
 {
     [DbContext(typeof(FundooContext))]
-    partial class FundooContextModelSnapshot : ModelSnapshot
+    [Migration("20230816122900_updatedCollab")]
+    partial class updatedCollab
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,13 +119,13 @@ namespace RepoLayer.Migrations
                     b.HasOne("RepoLayer.Entity.NoteEntity", "Note")
                         .WithMany()
                         .HasForeignKey("NoteID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("RepoLayer.Entity.UserEntity", "User")
                         .WithMany("Collabs")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -132,7 +134,7 @@ namespace RepoLayer.Migrations
                     b.HasOne("RepoLayer.Entity.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
