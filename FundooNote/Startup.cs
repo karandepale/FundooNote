@@ -39,11 +39,16 @@ namespace FundooNote
         public void ConfigureServices(IServiceCollection services)
         {
             // IMPLEMENT CLOUDINARY:-
-                        services.AddSingleton(new Cloudinary(new Account(
-                                cloud: "YOUR_CLOUD_NAME",
-                                apiKey: "YOUR_API_KEY",
-                                apiSecret: "YOUR_API_SECRET"
-                            )));
+
+            //cloudinary
+            IConfigurationSection configurationSection = Configuration.GetSection("CloudinaryConnection");
+            Account cloudinaryAccount = new Account(
+                configurationSection["cloud_name"],
+                configurationSection["cloud_api_key"],
+                configurationSection["cloud_api_secret"]
+                );
+            Cloudinary cloudinary = new Cloudinary(cloudinaryAccount);
+            services.AddSingleton(cloudinary);
 
 
             services.AddControllers();
@@ -61,6 +66,9 @@ namespace FundooNote
             // NOTES TABLE CONFIGURATION:-
             services.AddTransient<INotesRepo , NotesRepo>();
             services.AddTransient<INotesBusiness, NotesBusiness>();
+
+            services.AddTransient<FileService, FileService>();
+
 
             // SWAGGER IMPLEMENTATION:-
             //swagger:-

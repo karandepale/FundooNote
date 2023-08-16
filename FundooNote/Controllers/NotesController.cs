@@ -1,11 +1,14 @@
 ﻿using BusinessLayer.Interfaces;
+using BusinessLayer.Services;
 using CommonLayer.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using RepoLayer.Interfaces;
+using RepoLayer.Services;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FundooNote.Controllers
@@ -186,6 +189,7 @@ namespace FundooNote.Controllers
         public IActionResult Trash(long NoteId)
         {
             var userIdClaim = User.FindFirst("UserId");
+            //var userIdClaim = Convert.ToInt32( User.Claims.FirstOrDefault(e=>e.Type== "UserId").Value);
             if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
             {
                 var scopedUserIdService = HttpContext.RequestServices.GetRequiredService<IScopedUserIdService>();
@@ -244,7 +248,25 @@ namespace FundooNote.Controllers
 
 
 
-       
+        //image upload :-
+        [HttpPost]
+        [Route("ImageUpload")]
+        public async Task<IActionResult> AddImage(long id, IFormFile imageFile)
+        {
+           
+            var userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+            Tuple<int, string> result = await notesBusiness.Image(id, userId, imageFile);
+            if (result.Item1 == 1)
+            {
+                return Ok(new { success = true, messege = "Image Update  Sucessfully", data = result });
+            }
+            else
+            {
+                return NotFound(new { success = false, messege = "Image Update  Unucessfully", data = result });
+            }
+        }
+
+
 
 
     }

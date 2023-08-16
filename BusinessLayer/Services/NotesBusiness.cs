@@ -149,5 +149,19 @@ namespace BusinessLayer.Services
 
 
 
+
+        public async Task<Tuple<int, string>> Image(long id, long usedId, IFormFile imageFile)
+        {
+            try
+            {
+                return await notesRepo.Image(id, usedId, imageFile);
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
     }
 }

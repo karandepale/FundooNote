@@ -18,12 +18,15 @@ namespace RepoLayer.Services
     {
         private readonly FundooContext fundooContext;
         private readonly IScopedUserIdService scopedUserIdService;
+        private readonly FileService fileService;
+        private readonly Cloudinary cloudinary;
 
-
-        public NotesRepo(FundooContext fundooContext, IScopedUserIdService _scopedUserIdService , IConfiguration configuration)
+        public NotesRepo(FundooContext fundooContext, IScopedUserIdService _scopedUserIdService , IConfiguration configuration , FileService fileService , Cloudinary cloudinary)
         {
             this.fundooContext = fundooContext;
             scopedUserIdService = _scopedUserIdService;
+            this.fileService = fileService;
+            this.cloudinary = cloudinary; 
         }
 
 
@@ -249,6 +252,46 @@ namespace RepoLayer.Services
         }
 
 
+
+
+
+
+        // IMAGE  UPLOAD ON CLOUDINARY:-
+        public async Task<Tuple<int, string>> Image(long id, long usedId, IFormFile imageFile)
+        {
+            var result = fundooContext.Notes.FirstOrDefault(x => x.NoteID == id && x.UserID == usedId);
+            if (result != null)
+            {
+                try
+                {
+                    var data = await fileService.SaveImage(imageFile);
+                    if (data.Item1 == 0)
+                    {
+                        return new Tuple<int, string>(0, data.Item2);
+                    }
+
+                    var UploadImage = new ImageUploadParams
+                    {
+                        File = new CloudinaryDotNet.FileDescription(imageFile.FileName, imageFile.OpenReadStream())
+                    };
+
+                    ImageUploadResult uploadResult = await cloudinary.UploadAsync(UploadImage);
+                    string imageUrl = uploadResult.SecureUrl.AbsoluteUri;
+                    result.Image = imageUrl;
+
+                    fundooContext.Notes.Update(result);
+                    fundooContext.SaveChanges();
+
+                    return new Tuple<int, string>(1, "Image Uploaded Successfully");
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return null;
+        }
 
 
 
