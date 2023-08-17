@@ -21,13 +21,16 @@ namespace RepoLayer.Services
         }
 
         // CREATE COLLAB LOGIC IMPLEMENTATION:-
-        public CollabEntity CreateCollab(CollabCreateModel model , long UserID , long NoteID)
+        public CollabEntity CreateCollab(CollabCreateModel model , long NoteID)
         {
             try
             {
+                var userId = scopedUserIdService.UserId;
+
+
                 CollabEntity collabEntity = new CollabEntity();
                 collabEntity.Email = model.Email;
-                collabEntity.UserID = UserID;
+                collabEntity.UserID = userId;
                 collabEntity.NoteID = NoteID;
 
                 fundooContext.Collab.Add(collabEntity);

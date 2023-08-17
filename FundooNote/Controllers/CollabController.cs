@@ -22,16 +22,27 @@ namespace FundooNote.Controllers
         //CREATE COLLAB :-
         [HttpPost]
         [Route("CreateCollab")]
-        public IActionResult CreateCollab(CollabCreateModel model , long UserID , long NoteID)
+        public IActionResult CreateCollab(CollabCreateModel model , long NoteID)
         {
-            var result = collabBusiness.CreateCollab(model , UserID , NoteID);
-            if(result != null)
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
             {
-                return Ok(new { success = true, message = "Collab Created Successful", data = result });
+                var scopedUserIdService = HttpContext.RequestServices.GetRequiredService<IScopedUserIdService>();
+                scopedUserIdService.UserId = userId;
+
+                var result = collabBusiness.CreateCollab(model, NoteID);
+                if (result != null)
+                {
+                    return Ok(new { success = true, message = "Collabs Created Successfully", data = result });
+                }
+                else
+                {
+                    return NotFound(new { success = false, message = "Collab Not Created", data = result });
+                }
             }
             else
             {
-                return BadRequest(new { success = false, message = "Collab is not Created", data = result });
+                return BadRequest(new { success = false, message = "Invalid user ID claim" });
             }
         }
 

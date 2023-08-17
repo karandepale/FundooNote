@@ -17,11 +17,11 @@ namespace BusinessLayer.Services
         }
 
 
-        public CollabEntity CreateCollab(CollabCreateModel model, long UserID, long NoteID)
+        public CollabEntity CreateCollab(CollabCreateModel model, long NoteID)
         {
             try
             {
-                return collabRepo.CreateCollab(model, UserID, NoteID);
+                return collabRepo.CreateCollab(model, NoteID);
             }
             catch (Exception ex)
             {

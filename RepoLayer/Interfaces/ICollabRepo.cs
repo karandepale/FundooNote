@@ -8,7 +8,7 @@ namespace RepoLayer.Interfaces
 {
     public interface ICollabRepo
     {
-        public CollabEntity CreateCollab(CollabCreateModel model, long UserID, long NoteID);
+        public CollabEntity CreateCollab(CollabCreateModel model, long NoteID);
         public List<CollabEntity> GetAllCollabs();
         public void DeleteACollab(long CollabID);
     }
