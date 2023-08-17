@@ -75,6 +75,10 @@ namespace FundooNote
             services.AddTransient<ICollabRepo , CollabRepo>();
             services.AddTransient<ICollabBusiness , CollabBusiness>();
 
+            //  LABELS TABLE CONFIGURATION :-
+            services.AddTransient<ILabelRepo , LabelsRepo>();
+            services.AddTransient<ILabelBusiness , LabelBusiness>();
+
             // SWAGGER IMPLEMENTATION:-
             //swagger:-
             services.AddSwaggerGen(c =>
