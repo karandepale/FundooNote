@@ -66,40 +66,40 @@ namespace FundooNote.Controllers
         }
 
 
-/*
+
         [HttpPut]
         [Route("UpdateLabel")]
-        public IActionResult UpdateLabel(LabelUpdateModel model , long LabelID)
+        public IActionResult UpdateLabel(LabelUpdateModel model, long LabelID)
         {
             var result = labelBusiness.UpdateLabel(model, LabelID);
-            if(result != null)
+            if (result != null)
             {
                 return Ok(new { success = true, message = "Label Updated Succesfully", data = result });
             }
             else
             {
-                return NotFound(new { success = false, message ="Label Not Updated", data = result });
+                return NotFound(new { success = false, message = "Label Not Updated", data = result });
             }
-        }*/
+        }
 
 
 
 
 
-      /*  [HttpDelete]
-        [Route("DeleteLabel")]
-        public IActionResult DeleteLabel(long LabelID)
-        {
-            try
-            {
-                labelBusiness.DeleteLabel(LabelID);
-                return Ok(new { success = true, message = "Label Deleted Successfully" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = "Label Deletion Failed", error = ex.Message });
-            }
-        }*/
+        /*  [HttpDelete]
+          [Route("DeleteLabel")]
+          public IActionResult DeleteLabel(long LabelID)
+          {
+              try
+              {
+                  labelBusiness.DeleteLabel(LabelID);
+                  return Ok(new { success = true, message = "Label Deleted Successfully" });
+              }
+              catch (Exception ex)
+              {
+                  return BadRequest(new { success = false, message = "Label Deletion Failed", error = ex.Message });
+              }
+          }*/
 
 
 
