@@ -86,20 +86,20 @@ namespace FundooNote.Controllers
 
 
 
-        /*  [HttpDelete]
-          [Route("DeleteLabel")]
-          public IActionResult DeleteLabel(long LabelID)
-          {
-              try
-              {
-                  labelBusiness.DeleteLabel(LabelID);
-                  return Ok(new { success = true, message = "Label Deleted Successfully" });
-              }
-              catch (Exception ex)
-              {
-                  return BadRequest(new { success = false, message = "Label Deletion Failed", error = ex.Message });
-              }
-          }*/
+        [HttpDelete]
+        [Route("DeleteLabel")]
+        public IActionResult DeleteLabel(long LabelID)
+        {
+            try
+            {
+                labelBusiness.DeleteLabel(LabelID);
+                return Ok(new { success = true, message = "Label Deleted Successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Label Deletion Failed", error = ex.Message });
+            }
+        }
 
 
 
