@@ -29,5 +29,47 @@ namespace BusinessLayer.Services
         }
 
 
+        public List<LabelsEntity> GetAllLabels(long NoteId)
+        {
+            try
+            {
+                return labelRepo.GetAllLabels(NoteId);
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+        public LabelsEntity UpdateLabel(LabelUpdateModel model, long LabelID)
+        {
+            try
+            {
+                return labelRepo.UpdateLabel(model, LabelID);
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+
+        public void DeleteLabel(long LabelID)
+        {
+            try
+            {
+                 labelRepo.DeleteLabel(LabelID);
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+
+
     }
 }

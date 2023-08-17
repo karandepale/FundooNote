@@ -9,5 +9,8 @@ namespace RepoLayer.Interfaces
     public interface ILabelRepo
     {
         public LabelsEntity CreateLabel(LabelCreateModel model, long NoteID);
+        public List<LabelsEntity> GetAllLabels(long NoteId);
+        public LabelsEntity UpdateLabel(LabelUpdateModel model, long LabelID);
+        public void DeleteLabel(long LabelID);
     }
 }
