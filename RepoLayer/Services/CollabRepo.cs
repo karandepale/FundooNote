@@ -9,7 +9,7 @@ using System.Text;
 
 namespace RepoLayer.Services
 {
-    public class CollabRepo : ICollabRepo
+    public class CollabRepo : ICollabRepo 
     {
         private readonly FundooContext fundooContext;
         private readonly IScopedUserIdService scopedUserIdService;
@@ -53,12 +53,11 @@ namespace RepoLayer.Services
 
 
         // GET LIST OF COLLABS LOGIC IMPLEMENTATION :-
-        public List<CollabEntity> GetAllCollabs()
+        public List<CollabEntity> GetAllCollabs(long NoteID)
         {
             try
             {
-                var userId = scopedUserIdService.UserId;
-                var result = fundooContext.Collab.Where(data => data.UserID == userId).ToList();
+                var result = fundooContext.Collab.Where(data => data.NoteID == NoteID).ToList();
                 return result;
             }
             catch (Exception ex)

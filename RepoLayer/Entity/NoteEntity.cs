@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace RepoLayer.Entity
 {
@@ -21,8 +22,12 @@ namespace RepoLayer.Entity
         public bool IsPin { get; set; }
         public bool IsTrash { get; set; }
 
+
+
+        //FOREIGN KEY USERID FROM USER TABLE:-
         [ForeignKey("User")]
         public long UserID { get; set; }
+        [JsonIgnore]
         public UserEntity User { get; set; }
 
     }

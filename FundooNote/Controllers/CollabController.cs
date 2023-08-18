@@ -3,9 +3,14 @@ using BusinessLayer.Services;
 using CommonLayer.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using RepoLayer.Entity;
 using RepoLayer.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FundooNote.Controllers
 {
@@ -14,9 +19,11 @@ namespace FundooNote.Controllers
     public class CollabController : ControllerBase
     {
         private readonly ICollabBusiness collabBusiness;
-        public CollabController(ICollabBusiness collabBusiness)
+        private readonly IDistributedCache distributedCache;
+        public CollabController(ICollabBusiness collabBusiness , IDistributedCache distributedCache)
         {
             this.collabBusiness = collabBusiness;
+            this.distributedCache = distributedCache;
         }
 
         //CREATE COLLAB :-
@@ -47,32 +54,52 @@ namespace FundooNote.Controllers
         }
 
 
-        // GET ALL LIST OF COLLABS:-
+       
+
+
+
+
+        // COLLAB LIST USING RADDIS CACHE:-
         [HttpGet]
         [Route("GetAllCollabs")]
-        public IActionResult GetAllCollabs()
+        public async Task<IActionResult> GetCollabs(long NoteID)
         {
-            var userIdClaim = User.FindFirst("UserId");
-            if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
-            {
-                var scopedUserIdService = HttpContext.RequestServices.GetRequiredService<IScopedUserIdService>();
-                scopedUserIdService.UserId = userId;
+            var key = "collabs";
+            var cacheData = await distributedCache.GetStringAsync(key);
+            List<CollabEntity> result;
 
-                var result = collabBusiness.GetAllCollabs();
-                if (result != null)
-                {
-                    return Ok(new { success = true, message = "Collabs Getting Successfully", data = result });
-                }
-                else
-                {
-                    return NotFound(new { success = false, message = "Collabs List Not Getting", data = result });
-                }
+            if(cacheData != null)
+            {
+                result = JsonConvert.DeserializeObject<List<CollabEntity>>(cacheData);
             }
             else
             {
-                return BadRequest(new { success = false, message = "Invalid user ID claim" });
+                result = collabBusiness.GetAllCollabs(NoteID);
+                cacheData = JsonConvert.SerializeObject(result);
+
+                await distributedCache.SetStringAsync(key, cacheData , new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+                    SlidingExpiration = TimeSpan.FromMinutes(2)
+                });
+            }
+            if (result != null)
+            {
+                return Ok(new { success = true, message = "Collabs Getting Successfully", data = result });
+            }
+            else
+            {
+                return NotFound(new { success = false, message = "Collabs  Not Found", data = result });
             }
         }
+       
+
+
+
+
+
+
+
 
 
 

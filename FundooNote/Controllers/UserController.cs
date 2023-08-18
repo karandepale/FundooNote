@@ -9,6 +9,12 @@ using System;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
+using RepoLayer.Entity;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FundooNote.Controllers
 {
@@ -18,12 +24,17 @@ namespace FundooNote.Controllers
     {
 
         private readonly IUserBusiness userBusiness;
-        public UserController(IUserBusiness userBusiness)
+        //RADDIS:-
+        private readonly IDistributedCache distributedCache;
+        public UserController(IUserBusiness userBusiness , IDistributedCache distributedCache)
         {
             this.userBusiness = userBusiness;
+            this.distributedCache = distributedCache;
         }
 
 
+
+        // USER REGISTRATION API:-
         [HttpPost]
         [Route("Registration")]
         public IActionResult Registration(UserRegistrationModel model)
@@ -40,7 +51,7 @@ namespace FundooNote.Controllers
         }
 
 
-
+        // USER LOGIN API
            [HttpPost]
           [Route("Login")]
            public IActionResult UserLogin(UserLoginModel model)
@@ -60,27 +71,46 @@ namespace FundooNote.Controllers
 
        
 
-
-
+        // DISTRIBUTED CACHING RADDIS:-
+        // GET USER'S LIST API:-
         [HttpGet]
         [Route("UserList")]
-        public IActionResult GetAllResult()
+        public async Task<IActionResult> GetAllResult()
         {
-            var result = userBusiness.GetAllUser();
-            if (result != null)
+            var cacheKey = "userList";
+            var serializedUserList = await distributedCache.GetStringAsync(cacheKey);
+
+            List<UserEntity> userList;
+
+            if (serializedUserList != null)
             {
-                return Ok(new { success = true, message = "User List Getting Successful", data = result });
+                userList = JsonConvert.DeserializeObject<List<UserEntity>>(serializedUserList);
             }
             else
             {
-                return NotFound(new { success = false, message = "User List Getting Failed", data = result });
+                userList = userBusiness.GetAllUser();
 
+                serializedUserList = JsonConvert.SerializeObject(userList);
+                await distributedCache.SetStringAsync(cacheKey, serializedUserList, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+                    SlidingExpiration = TimeSpan.FromMinutes(2)
+                });
+            }
+
+            if (userList != null)
+            {
+                return Ok(new { success = true, message = "User List Getting Successful", data = userList });
+            }
+            else
+            {
+                return NotFound(new { success = false, message = "User List Getting Failed" });
             }
         }
 
 
 
-
+        // GET USER BY THEIR USERID:-
         [HttpGet]
         [Route("GetUserByID")]
         public IActionResult GetUserByID(long UserID)

@@ -38,8 +38,14 @@ namespace FundooNote
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // IMPLEMENT CLOUDINARY:-
+            //RADDIS CONFIGURATION :-
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
 
+
+            // IMPLEMENT CLOUDINARY:-
             //cloudinary
             IConfigurationSection configurationSection = Configuration.GetSection("CloudinaryConnection");
             Account cloudinaryAccount = new Account(
@@ -54,7 +60,7 @@ namespace FundooNote
             services.AddControllers();
             services.AddDbContext<FundooContext>(opts => opts.UseSqlServer(Configuration["ConnectionString:FundooDB"]));
 
-           //DI FOR SCOPED SERVICE:-(Scoped service is created per client HttpRequest)
+            //DI FOR SCOPED SERVICE:-(Scoped service is created per client HttpRequest)
             services.AddScoped<IScopedUserIdService, ScopedUserIdService>();
 
 
@@ -64,7 +70,7 @@ namespace FundooNote
             services.AddTransient<IUserBusiness, UserBusiness>();
 
             // NOTES TABLE CONFIGURATION:-
-            services.AddTransient<INotesRepo , NotesRepo>();
+            services.AddTransient<INotesRepo, NotesRepo>();
             services.AddTransient<INotesBusiness, NotesBusiness>();
 
             // Upload image on Cloudinary:-
@@ -72,12 +78,12 @@ namespace FundooNote
 
 
             //  COLLAB TABLE CONFIGURATION:-
-            services.AddTransient<ICollabRepo , CollabRepo>();
-            services.AddTransient<ICollabBusiness , CollabBusiness>();
+            services.AddTransient<ICollabRepo, CollabRepo>();
+            services.AddTransient<ICollabBusiness, CollabBusiness>();
 
             //  LABELS TABLE CONFIGURATION :-
-            services.AddTransient<ILabelRepo , LabelsRepo>();
-            services.AddTransient<ILabelBusiness , LabelBusiness>();
+            services.AddTransient<ILabelRepo, LabelsRepo>();
+            services.AddTransient<ILabelBusiness, LabelBusiness>();
 
             // SWAGGER IMPLEMENTATION:-
             //swagger:-

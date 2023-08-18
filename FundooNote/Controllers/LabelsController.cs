@@ -3,9 +3,14 @@ using BusinessLayer.Services;
 using CommonLayer.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using RepoLayer.Entity;
 using RepoLayer.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FundooNote.Controllers
 {
@@ -13,10 +18,14 @@ namespace FundooNote.Controllers
     [ApiController]
     public class LabelsController : ControllerBase
     {
+        //RADDIS CACHE:-
+        private readonly IDistributedCache distributedCache;
+
         private readonly ILabelBusiness labelBusiness;
-        public LabelsController(ILabelBusiness labelBusiness)
+        public LabelsController(ILabelBusiness labelBusiness , IDistributedCache distributedCache)
         {
             this.labelBusiness = labelBusiness;
+            this.distributedCache = distributedCache;
         }
 
 
@@ -49,21 +58,46 @@ namespace FundooNote.Controllers
 
 
 
+
+
+        // GET ALL LABELS USING RADDIS CACHE:-
         [HttpGet]
         [Route("GetAllLabels")]
-        public IActionResult GetAllLabels(long NoteID)
+        public async Task<IActionResult> GetLabels(long NoteID)
         {
-            var result = labelBusiness.GetAllLabels(NoteID);
-            if(result != null)
+            var myKey = "labelList";
+            var serializeLabelList = await distributedCache.GetStringAsync(myKey);
+            List<LabelsEntity> result;
+
+            if(serializeLabelList != null)
+            {
+                result = JsonConvert.DeserializeObject<List<LabelsEntity>>(serializeLabelList);
+            }
+            else
+            {
+                result = labelBusiness.GetAllLabels(NoteID);
+                serializeLabelList = JsonConvert.SerializeObject(result);
+
+                await distributedCache.SetStringAsync(myKey, serializeLabelList, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+                    SlidingExpiration = TimeSpan.FromMinutes(2)
+                } );
+            }
+
+            if (result != null)
             {
                 return Ok(new { success = true, message = "List Of Labels getting Successful.", data = result });
             }
             else
             {
                 return NotFound(new { success = false, message = "List Of Labels Not getting.", data = result });
-
             }
+
         }
+
+
+
 
 
 

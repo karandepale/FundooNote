@@ -1,14 +1,21 @@
 ﻿using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using CommonLayer.Model;
+using MassTransit.Internals.GraphValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using RepoLayer.Entity;
 using RepoLayer.Interfaces;
 using RepoLayer.Services;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace FundooNote.Controllers
@@ -18,9 +25,14 @@ namespace FundooNote.Controllers
     public class NotesController : ControllerBase
     {
         private readonly INotesBusiness notesBusiness;
-        public NotesController(INotesBusiness notesBusiness)
+
+        //RADDIS:-
+        private readonly IDistributedCache distributedCache;
+
+        public NotesController(INotesBusiness notesBusiness  , IDistributedCache distributedCache)
         {
             this.notesBusiness = notesBusiness;
+            this.distributedCache = distributedCache;
         }
 
 
@@ -42,33 +54,58 @@ namespace FundooNote.Controllers
 
 
 
-        // GET NOTES lIST:-
+
+        // GETTING NOTES LIST USING RADDIS CACHE :-
         [Authorize]
         [HttpGet]
         [Route("GetAllNotes")]
-        public IActionResult GetNotes()
+        public async Task<IActionResult> GetAllNotes()
         {
-            var userIdClaim = User.FindFirst("UserId");
-            if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
-            {
-                var scopedUserIdService = HttpContext.RequestServices.GetRequiredService<IScopedUserIdService>();
-                scopedUserIdService.UserId = userId;
+            var cacheKey = $"noteList_{User.FindFirst("UserId").Value}";
+            var serializedNotesList = await distributedCache.GetStringAsync(cacheKey);
+            List<NoteEntity> notesList;
 
-                var result = notesBusiness.GetAllNotes();
-                if (result != null)
-                {
-                    return Ok(new { success = true, message = "Notes Getting Successfully", data = result });
-                }
-                else
-                {
-                    return NotFound(new { success = false, message = "Note List Not Getting", data = result });
-                }
+            if (serializedNotesList != null)
+            {
+                notesList = JsonConvert.DeserializeObject<List<NoteEntity>>(serializedNotesList);
             }
             else
             {
-                return BadRequest(new { success = false, message = "Invalid user ID claim" });
+                var userIdClaim = User.FindFirst("UserId");
+                if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
+                {
+                    var scopedUserIdService = HttpContext.RequestServices.GetRequiredService<IScopedUserIdService>();
+                    scopedUserIdService.UserId = userId;
+
+                    notesList = notesBusiness.GetAllNotes();
+                    serializedNotesList = JsonConvert.SerializeObject(notesList);
+
+                    await distributedCache.SetStringAsync(cacheKey, serializedNotesList,
+                        new DistributedCacheEntryOptions
+                        {
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+                            SlidingExpiration = TimeSpan.FromMinutes(2)
+                        });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Invalid user ID claim" });
+                }
+            }
+
+            if (notesList != null)
+            {
+                return Ok(new { success = true, message = "Notes getting successful.", data = notesList });
+            }
+            else
+            {
+                return NotFound(new { success = false, message = "Notes not found", data = notesList });
             }
         }
+
+
+
+
 
 
 

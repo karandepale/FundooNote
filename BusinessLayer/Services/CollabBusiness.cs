@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace BusinessLayer.Services
-{
+{ 
     public class CollabBusiness : ICollabBusiness
     {
         private readonly ICollabRepo collabRepo;
@@ -30,11 +30,11 @@ namespace BusinessLayer.Services
         }
 
 
-        public List<CollabEntity> GetAllCollabs()
+        public List<CollabEntity> GetAllCollabs(long NoteID)
         {
             try
             {
-                return collabRepo.GetAllCollabs();
+                return collabRepo.GetAllCollabs(NoteID);
             }
             catch (Exception ex)
             {
