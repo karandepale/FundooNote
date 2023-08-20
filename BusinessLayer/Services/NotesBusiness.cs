@@ -163,5 +163,21 @@ namespace BusinessLayer.Services
         }
 
 
+
+
+        public NoteEntity CopyNote(long noteId)
+        {
+            try
+            {
+                return  notesRepo.CopyNote(noteId);
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+
     }
 }

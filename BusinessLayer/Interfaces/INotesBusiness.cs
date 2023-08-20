@@ -21,5 +21,7 @@ namespace BusinessLayer.Interfaces
         public bool IsTrash(long NoteID);
         public bool IsPin(long NoteID);
         public Task<Tuple<int, string>> Image(long id, long usedId, IFormFile imageFile);
+        public NoteEntity CopyNote(long noteId);
+
     }
 }

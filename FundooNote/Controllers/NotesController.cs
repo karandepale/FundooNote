@@ -318,5 +318,36 @@ namespace FundooNote.Controllers
 
 
 
+        [Authorize]
+        [HttpPost]
+        [Route("CopyNote")]
+        public IActionResult CopyNote(long noteId)
+        {
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
+            {
+                var scopedUserIdService = HttpContext.RequestServices.GetRequiredService<IScopedUserIdService>();
+                scopedUserIdService.UserId = userId;
+
+                var result = notesBusiness.CopyNote(noteId);
+                if (result != null)
+                {
+                    return Ok(new { success = true, message = "Note Copied Successfully", data = result });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Note Copy Failed" });
+                }
+            }
+            else
+            {
+                return BadRequest("Invalid User");
+            }
+        }
+
+
+
+
+
     }
 }
