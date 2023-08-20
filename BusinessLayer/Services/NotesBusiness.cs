@@ -19,11 +19,11 @@ namespace BusinessLayer.Services
             this.notesRepo = notesRepo;
         }
 
-        public NoteEntity CreateNotes(NotesCreateModel model, long UserID)
+        public NoteEntity CreateNotes(NotesCreateModel model)
         {
             try
             {
-                return notesRepo.CreateNotes(model, UserID);
+                return notesRepo.CreateNotes(model);
             }
             catch (Exception ex)
             {
@@ -35,7 +35,7 @@ namespace BusinessLayer.Services
         {
             try
             {
-                return notesRepo.GetAllNotes();   
+                return notesRepo.GetAllNotes();
             }
             catch (Exception ex)
             {
@@ -86,7 +86,7 @@ namespace BusinessLayer.Services
         }
 
 
-       
+
 
 
         public List<NoteEntity> SearchNoteByQuery(string myinput)

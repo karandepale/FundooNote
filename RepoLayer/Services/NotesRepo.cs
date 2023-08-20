@@ -21,42 +21,43 @@ namespace RepoLayer.Services
         private readonly FileService fileService;
         private readonly Cloudinary cloudinary;
 
-        public NotesRepo(FundooContext fundooContext, IScopedUserIdService _scopedUserIdService , IConfiguration configuration , FileService fileService , Cloudinary cloudinary)
+        public NotesRepo(FundooContext fundooContext, IScopedUserIdService _scopedUserIdService, IConfiguration configuration, FileService fileService, Cloudinary cloudinary)
         {
             this.fundooContext = fundooContext;
             scopedUserIdService = _scopedUserIdService;
             this.fileService = fileService;
-            this.cloudinary = cloudinary; 
+            this.cloudinary = cloudinary;
         }
 
 
         //CREATE NOTES METHOD IMPLEMENTATION:-
-        public NoteEntity CreateNotes(NotesCreateModel model , long UserID)
+        public NoteEntity CreateNotes(NotesCreateModel model)
         {
             try
             {
+                var userId = scopedUserIdService.UserId;
                 NoteEntity noteEntity = new NoteEntity();
 
-                noteEntity.UserID = UserID; 
+                noteEntity.UserID = userId;
                 noteEntity.Title = model.Title;
                 noteEntity.Description = model.Description;
                 noteEntity.Reminder = model.Reminder;
                 noteEntity.Background = model.Background;
                 noteEntity.Image = model.Image;
-                noteEntity.IsArchive  = model.IsArchive;
+                noteEntity.IsArchive = model.IsArchive;
                 noteEntity.IsPin = model.IsPin;
                 noteEntity.IsTrash = model.IsTrash;
 
                 fundooContext.Notes.Add(noteEntity);
                 fundooContext.SaveChanges();
 
-                if(noteEntity != null)
+                if (noteEntity != null)
                 {
                     return noteEntity;
                 }
                 else
                 {
-                    return null; 
+                    return null;
                 }
             }
             catch (Exception ex)
@@ -88,8 +89,8 @@ namespace RepoLayer.Services
             try
             {
                 var result = fundooContext.Notes.FirstOrDefault
-                    (data=> data.NoteID == NoteID);
-                if(result != null)
+                    (data => data.NoteID == NoteID);
+                if (result != null)
                 {
                     return result;
                 }
@@ -109,14 +110,14 @@ namespace RepoLayer.Services
 
 
         // UPDATE A NOTE:-
-        public NoteEntity UpdateNote(NoteUpdateModel model , long NoteID)
+        public NoteEntity UpdateNote(NoteUpdateModel model, long NoteID)
         {
             try
             {
                 var result = fundooContext.Notes.FirstOrDefault
-                    ( data => data.NoteID == NoteID );
+                    (data => data.NoteID == NoteID);
 
-                if( result != null)
+                if (result != null)
                 {
                     result.Title = model.Title;
                     result.Description = model.Description;
@@ -199,12 +200,12 @@ namespace RepoLayer.Services
 
             if (note != null)
             {
-                note.IsArchive = !note.IsArchive; 
+                note.IsArchive = !note.IsArchive;
                 fundooContext.SaveChanges();
-                return note.IsArchive; 
+                return note.IsArchive;
             }
 
-            return false; 
+            return false;
         }
 
 
@@ -215,7 +216,7 @@ namespace RepoLayer.Services
             var result = fundooContext.Notes.FirstOrDefault
                 (data => data.NoteID == NoteID && data.UserID == userId);
 
-            if(result != null)
+            if (result != null)
             {
                 result.IsTrash = !result.IsTrash;
                 fundooContext.SaveChanges();

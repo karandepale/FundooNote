@@ -11,7 +11,7 @@ namespace BusinessLayer.Interfaces
 {
     public interface INotesBusiness
     {
-        public NoteEntity CreateNotes(NotesCreateModel model, long UserID);
+        public NoteEntity CreateNotes(NotesCreateModel model);
         public List<NoteEntity> GetAllNotes();
         public NoteEntity UpdateNote(NoteUpdateModel model, long NoteID);
         void DeleteANote(long NoteID);

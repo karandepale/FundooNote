@@ -29,7 +29,7 @@ namespace FundooNote.Controllers
         //RADDIS:-
         private readonly IDistributedCache distributedCache;
 
-        public NotesController(INotesBusiness notesBusiness  , IDistributedCache distributedCache)
+        public NotesController(INotesBusiness notesBusiness, IDistributedCache distributedCache)
         {
             this.notesBusiness = notesBusiness;
             this.distributedCache = distributedCache;
@@ -37,18 +37,30 @@ namespace FundooNote.Controllers
 
 
         // CREATE NOTE:-
+        [Authorize]
         [HttpPost]
         [Route("CreateNotes")]
-        public IActionResult CreateNote(NotesCreateModel model , long UserID)
+        public IActionResult CreateNote(NotesCreateModel model)
         {
-            var result = notesBusiness.CreateNotes(model, UserID);
-            if(result != null)
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
             {
-                return Ok(new { success = true, message = "Note Created Successful", data = result });
+                var scopedUserIdService = HttpContext.RequestServices.GetRequiredService<IScopedUserIdService>();
+                scopedUserIdService.UserId = userId;
+
+                var result = notesBusiness.CreateNotes(model);
+                if (result != null)
+                {
+                    return Ok(new { success = true, message = "Note Created Successful", data = result });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Note is not Created", data = result });
+                }
             }
             else
             {
-                return BadRequest(new { success = false, message = "Note is not Created", data = result });
+                return BadRequest("Invalid User");
             }
         }
 
@@ -132,7 +144,7 @@ namespace FundooNote.Controllers
         // UPDATE A NOTE:-
         [HttpPost]
         [Route("UpdateNote")]
-        public IActionResult UpdateNote(NoteUpdateModel model , long NoteID)
+        public IActionResult UpdateNote(NoteUpdateModel model, long NoteID)
         {
             var result = notesBusiness.UpdateNote(model, NoteID);
             if (result != null)
@@ -171,7 +183,7 @@ namespace FundooNote.Controllers
             try
             {
                 var result = notesBusiness.SearchNoteByQuery(myinput);
-                if(result != null)
+                if (result != null)
                 {
                     return Ok(new { success = true, message = "Searched Data successfully", data = result });
                 }
@@ -290,7 +302,7 @@ namespace FundooNote.Controllers
         [Route("ImageUpload")]
         public async Task<IActionResult> AddImage(long id, IFormFile imageFile)
         {
-           
+
             var userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
             Tuple<int, string> result = await notesBusiness.Image(id, userId, imageFile);
             if (result.Item1 == 1)
